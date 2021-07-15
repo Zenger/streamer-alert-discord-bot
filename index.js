@@ -61,7 +61,7 @@ function announce_streamer_list( msg ) {
 
 
                 if (_active_streamers.includes( streamer_username )) {
-                    msg.channel.send(`<@${user_id}> "${streamer_username}" is live and streaming!`);
+                    msg.channel.send(`<@${user_id}> "${streamer_username}" is live and streaming! https://twitch.tv/${streamer_username}`);
 
                     console.log(`[Announced] ${user_id} about ${streamer_username} being live and removed from the list`);
                     _remove_watchers.push(user_id + ":" + streamer_username);
