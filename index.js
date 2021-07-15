@@ -48,7 +48,7 @@ client.on('ready', () => {
             const command = args.shift().toLowerCase()
 
 
-            if (command == "help" || "h") {
+            if (command == "help" || command == "h") {
                 msg.reply("\n!sr help: To show this command\n!sr add <twitch_user> will add the user to a global watchlist when we query twitch for live users.\n!sr remove <twitch_user> removes the user.\n!sr subscribe/sub <twitch_user> will add your username to a watch list and when the bot sees the user online it will @ you.\n!sr unsubscribe/unsub will remove the user from the list.\nNote that sub will @ then remove you from the subscribers list so remember to re-susbscribe to a user if you missed it.");
                 return;
             }
