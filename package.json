@@ -1,0 +1,18 @@
+{
+  "name": "streamer-alert",
+  "version": "1.0.0",
+  "description": "Discord bot to alert when streamers get live",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zenger",
+  "license": "WTFPL",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "twitch": "^4.6.1",
+    "twitch-auth": "^4.6.1"
+  }
+}
