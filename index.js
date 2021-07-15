@@ -11,47 +11,75 @@ const client = new Discord.Client();
 
 
 function get_active_streamers() {
-    
+
    var streamer_list = fs.readFileSync('streamers.json').toString().split("\n");
    streamer_list.pop();
 
-   
+   console.log('[polling twitch] current list ' + streamer_list.toString() );
+
     return axios({
         method: 'get',
         url: 'https://api.twitch.tv/helix/streams',
         headers: {
-            'Authorization': 'Bearer hxvdi363nen4o1mx1tcarnsrlmw9vw',
-            'Client-Id': 'f75iah6xxw7ijmqwhzm9wzmxep1ryb'
+            'Authorization': 'Bearer ' + process.env.TWITCH_BEARER,
+            'Client-Id': process.env.TWITCH_CLIENT
         },
         params : {
             'user_login': streamer_list
         }
     })
 
+
 }
 
 
 function announce_streamer_list( msg ) {
     get_active_streamers().then(resp => {
-        var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
-        streamer_list.forEach(sub => {
-            let s = sub.split(":");
-            let user_id = s[0]; let streamer_username = s[1];
 
-            if (resp.data.data.length > 0) {
-                resp.data.data.forEach(streamer => {
-                    if (streamer.user_login == streamer_username) {
-                        msg.channel.send(`<@${user_id}> "${streamer.user_login}" is live and streaming!`);
+        var streamers_watchlist = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
 
-                        var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
-                        var cleaned = streamer_list.filter(item => item != msg.author.id + ":" + streamer_username);
-                        fs.writeFileSync('streamers_watchlist.json', cleaned.join('\n'), (e) => { console.log(e); });
-			console.log(`${streamer.user_login} announced, ${user_id}`);
+        console.log('[announcing live streamers to subscribers: ]' + streamers_watchlist.toString());
+        let _active_streamers = [];
 
+        let _remove_watchers = [];
+
+
+        if (resp.data.data.length > 0) {
+                resp.data.data.forEach( streaminfo => {
+                    if (!_active_streamers.includes(streaminfo.user_login)) {
+                        _active_streamers.push( streaminfo.user_login);
                     }
-                });
-            }
-        });
+                })
+
+
+            console.log('[live streamers]: ' + _active_streamers.toString());
+
+            streamers_watchlist.forEach( watched => {
+                let s = watched.split(":");
+                let user_id = s[0]; let streamer_username = s[1];
+
+
+
+                if (_active_streamers.includes( streamer_username )) {
+                    msg.channel.send(`<@${user_id}> "${streamer_username}" is live and streaming!`);
+
+                    console.log(`[Announced] ${user_id} about ${streamer_username} being live and removed from the list`);
+                    _remove_watchers.push(user_id + ":" + streamer_username);
+                }
+            });
+
+            let copied_streamers_watchlist = streamers_watchlist;
+            _remove_watchers.forEach( removal => {
+                copied_streamers_watchlist.splice(streamers_watchlist.indexOf(removal), 1);
+            });
+
+
+
+
+            fs.writeFileSync('streamers_watchlist.json', copied_streamers_watchlist.join('\n'), (e) => { console.log(e); });
+
+        };
+
     })
 }
 
@@ -71,7 +99,7 @@ client.on('ready', () => {
             //splits off the first word from the array, which will be our command
             const command = args.shift().toLowerCase()
 
-            setInterval(announce_streamer_list, 600000, msg);
+            setInterval(announce_streamer_list, 60000, msg);
 
             if (command == "help" || command == "h") {
                 msg.reply("\n!sr help: To show this command\n!sr add <twitch_user> will add the user to a global watchlist when we query twitch for live users.\n!sr remove <twitch_user> removes the user.\n!sr subscribe/sub <twitch_user> will add your username to a watch list and when the bot sees the user online it will @ you.\n!sr unsubscribe/unsub will remove the user from the list.\n!sr list will list streamers in global watch list.\nNote that sub will @ then remove you from the subscribers list so remember to re-susbscribe to a user if you missed it.");
@@ -103,7 +131,7 @@ client.on('ready', () => {
                 var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
                 var cleaned = streamer_list.filter(item => item != msg.author.id + ":" + args[0]);
                 fs.writeFileSync('streamers_watchlist.json', cleaned.join('\n'), (e) => { console.log(e); });
-               
+
                 msg.reply("You'll no longer be notified when " + args[0] + " is live");
 
                 return;
@@ -115,10 +143,10 @@ client.on('ready', () => {
                     msg.reply("Streamer " + args[0] + " is already added to the list");
                 }
                 else {
-                    
+
                     streamer_list.push( args[0] );
                     fs.appendFileSync('streamers.json', args[0] + "\n", (e) => {
-                        
+
                     });
 
                     msg.reply("Added streamer " + args[0] + " to the global watch list");
@@ -149,20 +177,22 @@ client.on('ready', () => {
 
 
             if (command == "refresh") {
-                
-               
+
+
                 let stream_watch_role = msg.guild.roles.cache.find(role => role.name === "StreamWatch");
                 let membersWithRole = msg.guild.roles.cache.get(stream_watch_role.id).members;
+
+                announce_streamer_list(msg);
 
                 return;
 
             }
 
-            
+
 
         });
 
-        
+
 
     } catch(e ) {
         console.log(e);
