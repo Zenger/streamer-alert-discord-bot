@@ -46,7 +46,7 @@ function announce_streamer_list( msg ) {
                         var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
                         var cleaned = streamer_list.filter(item => item != msg.author.id + ":" + streamer_username);
                         fs.writeFileSync('streamers_watchlist.json', cleaned.join('\n'), (e) => { console.log(e); });
-
+			console.log(`${streamer.user_login} announced, ${user_id}`);
 
                     }
                 });
@@ -59,7 +59,7 @@ client.on('ready', () => {
     const prefix = '!sr'
     try {
 
-        client.on('message', async (msg) => {
+        client.on('message', (msg) => {
             //if our message doesnt start with our defined prefix, dont go any further into function
             if (!msg.content.startsWith(prefix)) {
                 return
@@ -92,7 +92,7 @@ client.on('ready', () => {
 
                     });
 
-                    msg.reply("Added streamer " + args[0] + " to the list");
+                    msg.reply("You'll be notified when " + args[0] + " is live!");
                 }
 
                 return;
@@ -104,7 +104,7 @@ client.on('ready', () => {
                 var cleaned = streamer_list.filter(item => item != msg.author.id + ":" + args[0]);
                 fs.writeFileSync('streamers_watchlist.json', cleaned.join('\n'), (e) => { console.log(e); });
                
-                msg.reply("Removed streamer " + args[0] + " from the list");
+                msg.reply("You'll no longer be notified when " + args[0] + " is live");
 
                 return;
             }
