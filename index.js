@@ -102,7 +102,7 @@ client.on('ready', () => {
             setInterval(announce_streamer_list, 600000, msg);
 
             if (command == "help" || command == "h") {
-                msg.reply("\n!sr help: To show this command\n!sr add <twitch_user> will add the user to a global watchlist when we query twitch for live users.\n!sr remove <twitch_user> removes the user.!sr sublist will show your current watchlist\n!sr subscribe/sub <twitch_user> will add your username to a watch list and when the bot sees the user online it will @ you.\n!sr unsubscribe/unsub will remove the user from the list.\n!sr list will list streamers in global watch list.\nNote that sub will @ then remove you from the subscribers list so remember to re-susbscribe to a user if you missed it.");
+                msg.reply("\n!sr help: To show this command\n!sr add <twitch_user> will add the user to a global watchlist when we query twitch for live users.\n!sr remove <twitch_user> removes the user.\n!sr list will list streamers in global watch list.\n!sr subscribe/sub <twitch_user> will add your username to a watch list and when the bot sees the user online it will @ you.\n!sr unsubscribe/unsub will remove the user from the list.\n!sr sublist will show your current watchlist\nNote that sub will @ then remove you from the subscribers list so remember to re-susbscribe to a user if you missed it.");
                 return;
             }
 
@@ -137,6 +137,28 @@ client.on('ready', () => {
                 return;
             }
 
+            if (command == "sublist") {
+                let author = msg.author;
+                var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
+                var subbed = [];
+
+                streamer_list.forEach(subbs => {
+                    let s = subbs.split(":");
+                    let user_id = s[0]; let streamer_username = s[1];
+
+                    if (user_id == author.id) {
+                        subbed.push(streamer_username);
+                    }
+                });
+                if (subbed.length > 0) {
+
+                    msg.reply('Your current subbed list is: ' + subbed.join(',').toString());
+                } else {
+                    msg.reply("You're not subscribed to any streamers currently.");
+                }
+            }
+
+
             if (command == "add") {
                 var streamer_list = fs.readFileSync('streamers.json').toString().split("\n");
                 if (streamer_list.includes( args[0] ) ) {
@@ -155,22 +177,6 @@ client.on('ready', () => {
             }
 
 
-            if (command == "sublist") {
-                let author = msg.author;
-                var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
-                var subbed = [];
-
-                streamer_list.forEach( subbs => {
-                    let s = subbs.split(":");
-                    let user_id = s[0]; let streamer_username = s[1];
-
-                    if (user_id == author.id) {
-                        subbed.push( streamer_username);
-                    }
-                });
-
-                msg.reply('Your current subbed list is: ' + subbed.join(',').toString());
-            }
 
 
             if (command == "remove") {
