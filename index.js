@@ -155,6 +155,24 @@ client.on('ready', () => {
             }
 
 
+            if (command == "sublist") {
+                let author = msg.author;
+                var streamer_list = fs.readFileSync('streamers_watchlist.json').toString().split("\n");
+                var subbed = [];
+
+                streamer_list.forEach( subbs => {
+                    let s = subbs.split(":");
+                    let user_id = s[0]; let streamer_username = s[1];
+
+                    if (user_id == author.id) {
+                        subbed.push( streamer_username);
+                    }
+                });
+
+                msg.reply('Your current subbed list is: ' + subbed.join(',').toString());
+            }
+
+
             if (command == "remove") {
                 var streamer_list = fs.readFileSync('streamers.json').toString().split("\n");
                 var cleaned = streamer_list.filter(item => item != args[0]);
