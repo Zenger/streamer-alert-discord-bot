@@ -102,7 +102,7 @@ client.on('ready', () => {
             setInterval(announce_streamer_list, 600000, msg);
 
             if (command == "help" || command == "h") {
-                msg.reply("\n!sr help: To show this command\n!sr add <twitch_user> will add the user to a global watchlist when we query twitch for live users.\n!sr remove <twitch_user> removes the user.\n!sr subscribe/sub <twitch_user> will add your username to a watch list and when the bot sees the user online it will @ you.\n!sr unsubscribe/unsub will remove the user from the list.\n!sr list will list streamers in global watch list.\nNote that sub will @ then remove you from the subscribers list so remember to re-susbscribe to a user if you missed it.");
+                msg.reply("\n!sr help: To show this command\n!sr add <twitch_user> will add the user to a global watchlist when we query twitch for live users.\n!sr remove <twitch_user> removes the user.!sr sublist will show your current watchlist\n!sr subscribe/sub <twitch_user> will add your username to a watch list and when the bot sees the user online it will @ you.\n!sr unsubscribe/unsub will remove the user from the list.\n!sr list will list streamers in global watch list.\nNote that sub will @ then remove you from the subscribers list so remember to re-susbscribe to a user if you missed it.");
                 return;
             }
 
